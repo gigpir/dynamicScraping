@@ -22,9 +22,9 @@ class Scraper():
         end = False
         firstPage = True
         reviews = []
-        sleep(5)
         timeout = 20
         pages = 0
+        # wait for the cookie dialog to appear
         try:
             element_present = EC.presence_of_element_located((By.ID, "onetrust-reject-all-handler"))
             WebDriverWait(self.driver, timeout).until(element_present)
@@ -39,7 +39,6 @@ class Scraper():
         self.outputFilename = "output/" + titleElem[0].text.replace(" ", "_") + ".xlsx"
 
         print(f"Processing page: {self.outputFilename}")
-
 
         while(not end):
             print(f"Page {pages}")
@@ -81,6 +80,7 @@ class Scraper():
                              rating=rating,
                              name=name)
                 reviews.append(rev)
+            # search for next page button
             try:
                 element_present = EC.presence_of_element_located((By.CLASS_NAME, "eRhUG"))
                 WebDriverWait(self.driver, timeout).until(element_present)
