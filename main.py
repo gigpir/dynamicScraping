@@ -19,5 +19,6 @@ if __name__ == '__main__':
     for p in pages:
         print(p)
         scraper = Scraper(startingLink=p).scrapeTripAdvisorReviewPage()
+        break
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

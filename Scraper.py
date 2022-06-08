@@ -36,13 +36,13 @@ class Scraper():
 
         # Get output file name
         titleElem = self.driver.find_elements(By.CLASS_NAME, "WlYyy.cPsXC.GeSzT")
-        self.outputFilename = titleElem[0].text.replace(" ", "_") + ".xlsx"
+        self.outputFilename = "output/" + titleElem[0].text.replace(" ", "_") + ".xlsx"
 
         print(f"Processing page: {self.outputFilename}")
 
 
         while(not end):
-            print(f"Page {pages}", end="\r")
+            print(f"Page {pages}")
             try:
                 element_present = EC.presence_of_element_located((By.CLASS_NAME, "ffbzW._c"))
                 WebDriverWait(self.driver, timeout).until(element_present)
@@ -53,11 +53,33 @@ class Scraper():
 
             mydivs = self.driver.find_elements(By.CLASS_NAME, "ffbzW._c")
             for div in mydivs:
-                date = div.find_elements(By.CLASS_NAME,"eRduX")[0].text if len(div.find_elements(By.CLASS_NAME,"eRduX"))>0 else 'Null'
+                # date is optional
+                date = div.find_elements(By.CLASS_NAME,"eRduX")[0].text if len(div.find_elements(By.CLASS_NAME,"eRduX"))>0 else 'null'
                 date = date.split("•")[0]
+
+                # origin is optional while contribution not
+                origin_contributions = div.find_elements(By.CLASS_NAME,"WlYyy.diXIH.bQCoY")[0].find_elements(By.CSS_SELECTOR, 'span') if len(div.find_elements(By.CLASS_NAME,"WlYyy.diXIH.bQCoY"))>0 else 'Null'
+                if len(origin_contributions) == 2:
+                    origin = origin_contributions[0].text
+                    contributions = origin_contributions[1].text
+                else:
+                    origin = 'null'
+                    contributions = origin_contributions[0].text
+                contributions = contributions.replace(" contributi", "")
+                #get rating
+                rating = div.find_elements(By.CLASS_NAME,"RWYkj.d.H0")[0].get_attribute('aria-label')
+                rating = rating.replace("Punteggio ", "").replace(' su 5', '')
+
+                #get name
+                name = div.find_elements(By.CLASS_NAME,"iPqaD._F.G-.ddFHE.eKwUx.btBEK.fUpii")[0].text
+
                 rev = Review(title=div.find_elements(By.CLASS_NAME,"NejBf")[0].text,
                              date=date,
-                             text=div.find_elements(By.CLASS_NAME,"NejBf")[1].text)
+                             text=div.find_elements(By.CLASS_NAME,"NejBf")[1].text,
+                             origin=origin,
+                             contributions=contributions,
+                             rating=rating,
+                             name=name)
                 reviews.append(rev)
             try:
                 element_present = EC.presence_of_element_located((By.CLASS_NAME, "eRhUG"))
@@ -74,7 +96,7 @@ class Scraper():
             else:
                 end = True
             pages += 1
-            if pages==500:
+            if pages == 500:
                 end = True
         if pages > 0:
             print(f"Scraped {pages} pages")
@@ -83,3 +105,5 @@ class Scraper():
     def save(self, reviews):
         df = pandas.DataFrame.from_records([s.to_dict() for s in reviews])
         df.to_excel(self.outputFilename)
+
+
