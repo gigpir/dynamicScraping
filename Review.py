@@ -1,5 +1,5 @@
 class Review:
-    def __init__(self, title, date, text, rating, name, origin,contributions):
+    def __init__(self, title, date, text, rating, name, origin,contributions, type):
         self.title = title
         self.date = date
         self.text = text
@@ -7,6 +7,7 @@ class Review:
         self.name = name
         self.origin = origin
         self.contributions = contributions
+        self.type = type
     def to_dict(self):
         return {
             'rating': self.rating,
@@ -14,6 +15,7 @@ class Review:
             'title': self.title,
             'origin': self.origin,
             'name': self.name,
+            'type': self.type,
             'contributions': self.contributions,
             'text': self.text,
         }

@@ -9,5 +9,7 @@ if __name__ == '__main__':
 
     pages = getPagesList("trip_advisor_links.txt")
     for p in pages:
-        print(p)
-        scraper = Scraper(startingLink=p).scrapeTripAdvisorReviewPage()
+        end = False
+        while not end:
+            if Scraper(startingLink=p).scrapeTripAdvisorReviewPage():
+                end = True
